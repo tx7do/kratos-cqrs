@@ -11,7 +11,7 @@ import (
 )
 
 // NewKafkaServer create a kafka server.
-func NewKafkaServer(c *conf.Data, _ log.Logger, s *service.LoggerJobService) *kafka.Server {
+func NewKafkaServer(c *conf.Server, _ log.Logger, s *service.LoggerJobService) *kafka.Server {
 	ctx := context.Background()
 
 	srv := kafka.NewServer(

@@ -1,4 +1,5 @@
 syntax = "proto3";
+
 package kratos.api;
 
 option go_package = "app/logger/job/internal/conf;conf";
@@ -26,8 +27,12 @@ message Server {
         string addr = 2;
         google.protobuf.Duration timeout = 3;
     }
+    message Kafka {
+        repeated string addrs = 1;
+    }
     HTTP http = 1;
     GRPC grpc = 2;
+    Kafka kafka = 3;
 }
 
 message Data {
@@ -44,12 +49,8 @@ message Data {
         google.protobuf.Duration read_timeout = 6;
         google.protobuf.Duration write_timeout = 7;
     }
-    message Kafka {
-        repeated string addrs = 1;
-    }
     Database database = 1;
     Redis redis = 2;
-    Kafka kafka = 3;
 }
 
 message Registry {

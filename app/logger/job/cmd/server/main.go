@@ -2,9 +2,9 @@ package main
 
 import (
 	"flag"
-	"github.com/go-kratos/kratos/v2"
-	"github.com/tx7do/kratos-transport/transport/kafka"
 	"os"
+	"strings"
+	"time"
 
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
@@ -13,6 +13,7 @@ import (
 	traceSdk "go.opentelemetry.io/otel/sdk/trace"
 	semConv "go.opentelemetry.io/otel/semconv/v1.4.0"
 
+	"github.com/go-kratos/kratos/v2"
 	"github.com/go-kratos/kratos/v2/config"
 	"github.com/go-kratos/kratos/v2/config/file"
 	"github.com/go-kratos/kratos/v2/log"
@@ -20,15 +21,34 @@ import (
 	"github.com/go-kratos/kratos/v2/registry"
 	"github.com/go-kratos/kratos/v2/transport/grpc"
 
+	// etcd config
+	etcdKratos "github.com/go-kratos/kratos/contrib/config/etcd/v2"
+	etcdV3 "go.etcd.io/etcd/client/v3"
+	GRPC "google.golang.org/grpc"
+
+	// consul config
+	consulKratos "github.com/go-kratos/kratos/contrib/config/consul/v2"
+	"github.com/hashicorp/consul/api"
+
+	// nacos config
+	nacosKratos "github.com/go-kratos/kratos/contrib/config/nacos/v2"
+	nacosClients "github.com/nacos-group/nacos-sdk-go/clients"
+	nacosConstant "github.com/nacos-group/nacos-sdk-go/common/constant"
+	"github.com/nacos-group/nacos-sdk-go/vo"
+
+	"github.com/tx7do/kratos-transport/transport/kafka"
+
 	"kratos-cqrs/app/logger/job/internal/conf"
 )
 
 // go build -ldflags "-X main.Version=x.y.z"
 var (
-	Name     = "kratos.logger.job"
-	Version  = "1.0.0"
+	Name          = "kratos.logger.job"
+	Version       = "1.0.0"
+	InstanceId, _ = os.Hostname()
+
 	flagConf string
-	Id, _    = os.Hostname()
+	env      = "dev"
 )
 
 func init() {
@@ -37,7 +57,7 @@ func init() {
 
 func newApp(logger log.Logger, gs *grpc.Server, ks *kafka.Server, rr registry.Registrar) *kratos.App {
 	return kratos.New(
-		kratos.ID(Id+"."+Name),
+		kratos.ID(InstanceId+"."+Name),
 		kratos.Name(Name),
 		kratos.Version(Version),
 		kratos.Metadata(map[string]string{}),
@@ -62,8 +82,8 @@ func NewTracerProvider(conf *conf.Trace) error {
 		traceSdk.WithResource(resource.NewSchemaless(
 			semConv.ServiceNameKey.String(Name),
 			semConv.ServiceVersionKey.String(Version),
-			semConv.ServiceInstanceIDKey.String(Id),
-			attribute.String("env", "dev"),
+			semConv.ServiceInstanceIDKey.String(InstanceId),
+			attribute.String("env", env),
 		)),
 	)
 
@@ -73,9 +93,10 @@ func NewTracerProvider(conf *conf.Trace) error {
 }
 
 func NewLoggerProvider() log.Logger {
+	l := log.NewStdLogger(os.Stdout)
 	return log.With(
-		log.NewStdLogger(os.Stdout),
-		"service.Id", Id,
+		l,
+		"service.InstanceId", InstanceId,
 		"service.name", Name,
 		"service.version", Version,
 		"ts", log.DefaultTimestamp,
@@ -85,12 +106,106 @@ func NewLoggerProvider() log.Logger {
 	)
 }
 
-func loadConfig() (*conf.Bootstrap, *conf.Registry) {
-	c := config.New(
+func getConfigKey(useBackslash bool) string {
+	if useBackslash {
+		return strings.Replace(Name, `.`, `/`, -1)
+	} else {
+		return Name
+	}
+}
+
+func NewNacosConfigSource() config.Source {
+	sc := []nacosConstant.ServerConfig{
+		*nacosConstant.NewServerConfig("127.0.0.1", 8849),
+	}
+
+	cc := nacosConstant.ClientConfig{
+		TimeoutMs:            10 * 1000, // http请求超时时间，单位毫秒
+		BeatInterval:         5 * 1000,  // 心跳间隔时间，单位毫秒
+		UpdateThreadNum:      20,        // 更新服务的线程数
+		LogLevel:             "debug",
+		CacheDir:             "../../configs/cache", // 缓存目录
+		LogDir:               "../../configs/log",   // 日志目录
+		NotLoadCacheAtStart:  true,                  // 在启动时不读取本地缓存数据，true--不读取，false--读取
+		UpdateCacheWhenEmpty: true,                  // 当服务列表为空时是否更新本地缓存，true--更新,false--不更新
+	}
+
+	nacosClient, err := nacosClients.NewConfigClient(
+		vo.NacosClientParam{
+			ClientConfig:  &cc,
+			ServerConfigs: sc,
+		},
+	)
+	if err != nil {
+		panic(err)
+	}
+
+	return nacosKratos.NewConfigSource(nacosClient,
+		nacosKratos.WithGroup(getConfigKey(false)),
+		nacosKratos.WithDataID("config.yaml"),
+	)
+}
+
+func NewEtcdConfigSource() config.Source {
+	etcdClient, err := etcdV3.New(etcdV3.Config{
+		Endpoints:   []string{"127.0.0.1:2379"},
+		DialTimeout: time.Second, DialOptions: []GRPC.DialOption{GRPC.WithBlock()},
+	})
+	if err != nil {
+		panic(err)
+	}
+
+	etcdSource, err := etcdKratos.New(etcdClient, etcdKratos.WithPath(getConfigKey(true)))
+	if err != nil {
+		panic(err)
+	}
+
+	return etcdSource
+}
+
+func NewApolloConfigSource() config.Source {
+	return nil
+}
+
+func NewConsulConfigSource() config.Source {
+	consulClient, err := api.NewClient(&api.Config{
+		Address: "127.0.0.1:8500",
+	})
+	if err != nil {
+		panic(err)
+	}
+
+	consulSource, err := consulKratos.New(consulClient, consulKratos.WithPath(getConfigKey(true)))
+	if err != nil {
+		panic(err)
+	}
+
+	//w, err := consulSource.Watch()
+	//if err != nil {
+	//	panic(err)
+	//}
+
+	return consulSource
+}
+
+func NewFileConfigSource() config.Source {
+	return file.NewSource(flagConf)
+}
+
+func NewConfigProvider() config.Config {
+	return config.New(
 		config.WithSource(
-			file.NewSource(flagConf),
+			NewFileConfigSource(),
+			NewConsulConfigSource(),
+			//NewNacosConfigSource(),
+			//NewEtcdConfigSource(),
+			//NewApolloConfigSource(),
 		),
 	)
+}
+
+func loadConfig() (*conf.Bootstrap, *conf.Registry) {
+	c := NewConfigProvider()
 
 	if err := c.Load(); err != nil {
 		panic(err)
