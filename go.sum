@@ -546,12 +546,6 @@ github.com/tmc/grpc-websocket-proxy v0.0.0-20190109142713-0ad062ec5ee5/go.mod h1
 github.com/toolkits/concurrent v0.0.0-20150624120057-a4371d70e3e3 h1:kF/7m/ZU+0D4Jj5eZ41Zm3IH/J8OElK1Qtd7tVKAwLk=
 github.com/toolkits/concurrent v0.0.0-20150624120057-a4371d70e3e3/go.mod h1:QDlpd3qS71vYtakd2hmdpqhJ9nwv6mD6A30bQ1BPBFE=
 github.com/tv42/httpunix v0.0.0-20150427012821-b75d8614f926/go.mod h1:9ESjWnEqriFuLhtthL60Sar/7RFoluCcXsuvEwTV5KM=
-github.com/tx7do/kratos-transport v0.0.0-20220304072945-8363da42d494 h1:UI8Xmc5+2bnBZojeWyZ4JzW6b/2COwwQ1aiIhurCfBI=
-github.com/tx7do/kratos-transport v0.0.0-20220304072945-8363da42d494/go.mod h1:+prpeOLQZ6PktBpwofEfSmUOPdzEhTw01h9uBWTDGo4=
-github.com/tx7do/kratos-transport v0.0.0-20220305115846-0e9d8ba434ad h1:YSEYlRGIWsBk8B3y+XS978PWF4yW2bZdqb03LCMT/pM=
-github.com/tx7do/kratos-transport v0.0.0-20220305115846-0e9d8ba434ad/go.mod h1:+prpeOLQZ6PktBpwofEfSmUOPdzEhTw01h9uBWTDGo4=
-github.com/tx7do/kratos-transport v0.0.0-20220305120837-9fbfebd2358a h1:Ze4iZY2Z2Ja0apnR+fU8OWKlXKiaDxJB7ghoK5vWIAY=
-github.com/tx7do/kratos-transport v0.0.0-20220305120837-9fbfebd2358a/go.mod h1:+prpeOLQZ6PktBpwofEfSmUOPdzEhTw01h9uBWTDGo4=
 github.com/tx7do/kratos-transport v0.0.0-20220305121630-7788f79a5bf4 h1:utCOsbmcAjr613T5kruhhddGbfUp/rq/CF1YFsEAP9M=
 github.com/tx7do/kratos-transport v0.0.0-20220305121630-7788f79a5bf4/go.mod h1:+prpeOLQZ6PktBpwofEfSmUOPdzEhTw01h9uBWTDGo4=
 github.com/xdg/scram v0.0.0-20180814205039-7eeb5667e42c h1:u40Z8hqBAAQyv+vATcGgV0YCnDjqSL7/q/JyPhhJSPk=
