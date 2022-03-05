@@ -19,18 +19,28 @@
 - 日志查询服务(kratos.logger.service)
 - 日志写入服务(kratos.logger.job)
 
+## 涵盖的技术点
+
+- 利用Kratos开发微服务
+- 利用Kratos框架实验CQRS
+- 利用TimeScaleDB(其实质为PostgreSQL的插件)存取时序数据
+- 利用Facbook的Entgo操作TimeScaleDB的时序数据
+- 集成Kafka,并将Kafka封装成Kratos的一个Server,用于接收数据
+- 将服务注册进入Consul,用于服务发现
+- 将服务注册进入Jaeger,用于链路跟踪
+- 从远程配置中心读取配置,Consul和Nacos可以直接用
+
 ### 日志查询服务
 
-- 开了gRPC服务用来给其他服务查询之用
-- 数据库连接的是TimeScaleDB
-- 使用了ent.go这个ORM库
+- 开了gRPC服务用来给其他服务查询之用(Postman已经支持调试gRPC)
+- 使用ORM框架Entgo进行TimeScaleDB的普通以及时序查询
 
 ### 日志写入服务
 
-开了Kafka连接,订阅了以下几个Topic:
+连接Kafka,订阅以下几个Topic:
 
 - `logger.sensor.ts` 用于写入传感器的遥感数据
-- `logger.sensor.instance` 用于写入传感器的实体数据
+- `logger.sensor.instance` 用于写入传感器的实体数据(实际设计上,它不应该存在在这里)
 
 ## 技术栈
 
@@ -128,7 +138,7 @@ docker run -d \
 
 ## 测试
 
-下载 [Postman](https://www.postman.com/downloads/) 发起gRPC请求.
+下载 [Postman](https://www.postman.com/downloads/) 向日志服务发起gRPC请求进行查询.
 
 下载 [Offset Explorer](https://www.kafkatool.com/download.html) 向 Topic ```logger.sensor.ts``` 发送JSON数据:
 
