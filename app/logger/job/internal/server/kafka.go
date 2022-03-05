@@ -22,13 +22,15 @@ func NewKafkaServer(c *conf.Server, _ log.Logger, s *service.LoggerJobService) *
 	_ = srv.RegisterSubscriber("logger.sensor.ts",
 		s.InsertSensorData,
 		broker.SubscribeContext(ctx),
-		broker.Queue("logger"),
+		broker.Queue("sensor_logger"),
+		//broker.DisableAutoAck(),
 	)
 
 	_ = srv.RegisterSubscriber("logger.sensor.instance",
 		s.InsertSensor,
 		broker.SubscribeContext(ctx),
-		broker.Queue("logger"),
+		broker.Queue("sensor"),
+		//broker.DisableAutoAck(),
 	)
 
 	return srv
