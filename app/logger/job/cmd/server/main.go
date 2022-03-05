@@ -2,15 +2,16 @@ package main
 
 import (
 	"flag"
+
 	"github.com/go-kratos/kratos/v2"
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/go-kratos/kratos/v2/registry"
 	"github.com/go-kratos/kratos/v2/transport/grpc"
-	"kratos-cqrs/pkg/util/bootstrap"
 
 	"github.com/tx7do/kratos-transport/transport/kafka"
 
 	"kratos-cqrs/app/logger/job/internal/conf"
+	"kratos-cqrs/pkg/util/bootstrap"
 )
 
 // go build -ldflags "-X main.Service.Version=x.y.z"
