@@ -48,12 +48,14 @@ var (
 	flagConf       string
 	flagEnv        string
 	flagConfigHost string
+	flagConfigType string
 )
 
 func init() {
 	flag.StringVar(&flagConf, "conf", "../../configs", "config path, eg: -conf config.yaml")
 	flag.StringVar(&flagEnv, "env", "dev", "runtime environment, eg: -env dev")
 	flag.StringVar(&flagConfigHost, "chost", "127.0.0.1:8500", "config server host, eg: -chost 127.0.0.1:8500")
+	flag.StringVar(&flagConfigType, "ctype", "consul", "config server host, eg: -ctype consul")
 }
 
 func newApp(logger log.Logger, gs *grpc.Server, rr registry.Registrar) *kratos.App {
@@ -112,6 +114,20 @@ func getConfigKey(useBackslash bool) string {
 	} else {
 		return Name
 	}
+}
+
+func NewRemoteConfigSource() config.Source {
+	switch flagConfigType {
+	case "nacos":
+		return NewNacosConfigSource()
+	case "consul":
+		return NewConsulConfigSource()
+	case "etcd":
+		return NewEtcdConfigSource()
+	case "apollo":
+		return NewApolloConfigSource()
+	}
+	return nil
 }
 
 func NewNacosConfigSource() config.Source {
@@ -196,10 +212,7 @@ func NewConfigProvider() config.Config {
 	return config.New(
 		config.WithSource(
 			NewFileConfigSource(),
-			NewConsulConfigSource(),
-			//NewNacosConfigSource(),
-			//NewEtcdConfigSource(),
-			//NewApolloConfigSource(),
+			NewRemoteConfigSource(),
 		),
 	)
 }
