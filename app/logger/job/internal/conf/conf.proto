@@ -56,6 +56,7 @@ message Registry {
     message Consul {
         string address = 1;
         string scheme = 2;
+        bool health_check = 3;
     }
     Consul consul = 1;
 }

@@ -2,23 +2,27 @@ package main
 
 import (
 	"flag"
-	"github.com/go-kratos/kratos/v2"
-	"github.com/go-kratos/kratos/v2/middleware/tracing"
-	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/attribute"
 	"os"
 
-	"kratos-cqrs/app/logger/service/internal/conf"
-
+	"github.com/go-kratos/kratos/v2"
 	"github.com/go-kratos/kratos/v2/config"
 	"github.com/go-kratos/kratos/v2/config/file"
 	"github.com/go-kratos/kratos/v2/log"
+	"github.com/go-kratos/kratos/v2/middleware/tracing"
 	"github.com/go-kratos/kratos/v2/registry"
 	"github.com/go-kratos/kratos/v2/transport/grpc"
+
+	"github.com/go-kratos/kratos/contrib/config/consul/v2"
+	"github.com/hashicorp/consul/api"
+
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/exporters/jaeger"
 	"go.opentelemetry.io/otel/sdk/resource"
 	traceSdk "go.opentelemetry.io/otel/sdk/trace"
 	semConv "go.opentelemetry.io/otel/semconv/v1.4.0"
+
+	"kratos-cqrs/app/logger/service/internal/conf"
 )
 
 // go build -ldflags "-X main.Version=x.y.z"
@@ -47,8 +51,8 @@ func newApp(logger log.Logger, gs *grpc.Server, rr registry.Registrar) *kratos.A
 	)
 }
 
-func setTracerProvider(url string) error {
-	exp, err := jaeger.New(jaeger.WithCollectorEndpoint(jaeger.WithEndpoint(url)))
+func NewTracerProvider(conf *conf.Trace) error {
+	exp, err := jaeger.New(jaeger.WithCollectorEndpoint(jaeger.WithEndpoint(conf.Endpoint)))
 	if err != nil {
 		return err
 	}
@@ -64,9 +68,10 @@ func setTracerProvider(url string) error {
 	return nil
 }
 
-func initLogger() log.Logger {
+func NewLoggerProvider() log.Logger {
+	l := log.NewStdLogger(os.Stdout)
 	return log.With(
-		log.NewStdLogger(os.Stdout),
+		l,
 		"service.id", id,
 		"service.name", Name,
 		"service.version", Version,
@@ -77,12 +82,31 @@ func initLogger() log.Logger {
 	)
 }
 
-func loadConfig() (*conf.Bootstrap, *conf.Registry) {
-	c := config.New(
+func NewConfigProvider() config.Config {
+	consulClient, err := api.NewClient(&api.Config{
+		Address: "127.0.0.1:8500",
+	})
+	if err != nil {
+		panic(err)
+	}
+
+	consulSource, err := consul.New(consulClient, consul.WithPath("jyiot/logger/service/"))
+	if err != nil {
+		panic(err)
+	}
+
+	fileSource := file.NewSource(flagConf)
+
+	return config.New(
 		config.WithSource(
-			file.NewSource(flagConf),
+			fileSource,
+			consulSource,
 		),
 	)
+}
+
+func loadConfig() (*conf.Bootstrap, *conf.Registry) {
+	c := NewConfigProvider()
 
 	if err := c.Load(); err != nil {
 		panic(err)
@@ -104,14 +128,14 @@ func loadConfig() (*conf.Bootstrap, *conf.Registry) {
 func main() {
 	flag.Parse()
 
-	logger := initLogger()
+	logger := NewLoggerProvider()
 
 	bc, rc := loadConfig()
 	if bc == nil || rc == nil {
 		panic("load config failed")
 	}
 
-	err := setTracerProvider(bc.Trace.Endpoint)
+	err := NewTracerProvider(bc.Trace)
 	if err != nil {
 		panic(err)
 	}

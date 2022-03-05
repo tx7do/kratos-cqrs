@@ -32,7 +32,7 @@ func initApp(confServer *conf.Server, registry *conf.Registry, confData *conf.Da
 	loggerJobService := service.NewLoggerJobService(sensorUseCase, sensorDataUseCase, logger)
 	grpcServer := server.NewGRPCServer(confServer, logger, loggerJobService)
 	kafkaServer := server.NewKafkaServer(confData, logger, loggerJobService)
-	registrar := server.NewRegistrar(registry)
+	registrar := server.NewConsulRegistrar(registry)
 	app := newApp(logger, grpcServer, kafkaServer, registrar)
 	return app, func() {
 		cleanup()

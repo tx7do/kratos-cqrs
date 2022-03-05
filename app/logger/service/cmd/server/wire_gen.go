@@ -31,7 +31,7 @@ func initApp(confServer *conf.Server, registry *conf.Registry, confData *conf.Da
 	sensorUseCase := biz.NewSensorUseCase(sensorRepo, logger)
 	loggerService := service.NewLoggerService(sensorDataUseCase, sensorUseCase, logger)
 	grpcServer := server.NewGRPCServer(confServer, logger, loggerService)
-	registrar := server.NewRegistrar(registry)
+	registrar := server.NewConsulRegistrar(registry)
 	app := newApp(logger, grpcServer, registrar)
 	return app, func() {
 		cleanup()

@@ -25,13 +25,10 @@ import (
 
 // go build -ldflags "-X main.Version=x.y.z"
 var (
-	// Name is the name of the compiled software.
-	Name = "kratos.logger.job"
-	// Version is the version of the compiled software.
-	Version = "1.0.0"
-	// flagConf is the config flag.
+	Name     = "kratos.logger.job"
+	Version  = "1.0.0"
 	flagConf string
-	id, _    = os.Hostname()
+	Id, _    = os.Hostname()
 )
 
 func init() {
@@ -40,7 +37,7 @@ func init() {
 
 func newApp(logger log.Logger, gs *grpc.Server, ks *kafka.Server, rr registry.Registrar) *kratos.App {
 	return kratos.New(
-		kratos.ID(id+"."+Name),
+		kratos.ID(Id+"."+Name),
 		kratos.Name(Name),
 		kratos.Version(Version),
 		kratos.Metadata(map[string]string{}),
@@ -53,27 +50,32 @@ func newApp(logger log.Logger, gs *grpc.Server, ks *kafka.Server, rr registry.Re
 	)
 }
 
-func setTracerProvider(url string) error {
-	exp, err := jaeger.New(jaeger.WithCollectorEndpoint(jaeger.WithEndpoint(url)))
+func NewTracerProvider(conf *conf.Trace) error {
+	exp, err := jaeger.New(jaeger.WithCollectorEndpoint(jaeger.WithEndpoint(conf.Endpoint)))
 	if err != nil {
 		return err
 	}
+
 	tp := traceSdk.NewTracerProvider(
 		traceSdk.WithSampler(traceSdk.ParentBased(traceSdk.TraceIDRatioBased(1.0))),
 		traceSdk.WithBatcher(exp),
 		traceSdk.WithResource(resource.NewSchemaless(
 			semConv.ServiceNameKey.String(Name),
+			semConv.ServiceVersionKey.String(Version),
+			semConv.ServiceInstanceIDKey.String(Id),
 			attribute.String("env", "dev"),
 		)),
 	)
+
 	otel.SetTracerProvider(tp)
+
 	return nil
 }
 
-func initLogger() log.Logger {
+func NewLoggerProvider() log.Logger {
 	return log.With(
 		log.NewStdLogger(os.Stdout),
-		"service.id", id,
+		"service.Id", Id,
 		"service.name", Name,
 		"service.version", Version,
 		"ts", log.DefaultTimestamp,
@@ -110,14 +112,14 @@ func loadConfig() (*conf.Bootstrap, *conf.Registry) {
 func main() {
 	flag.Parse()
 
-	logger := initLogger()
+	logger := NewLoggerProvider()
 
 	bc, rc := loadConfig()
 	if bc == nil || rc == nil {
 		panic("load config failed")
 	}
 
-	err := setTracerProvider(bc.Trace.Endpoint)
+	err := NewTracerProvider(bc.Trace)
 	if err != nil {
 		panic(err)
 	}

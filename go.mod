@@ -6,6 +6,7 @@ require (
 	entgo.io/ent v0.9.2-0.20210821141344-368a8f7a2e9a
 	github.com/armon/go-metrics v0.3.10 // indirect
 	github.com/fatih/color v1.13.0 // indirect
+	github.com/go-kratos/kratos/contrib/config/consul/v2 v2.0.0-20220301141459-ed6ab7caf9ca // indirect
 	github.com/go-kratos/kratos/contrib/registry/consul/v2 v2.0.0-20211119091424-ef3322ec0764
 	github.com/go-kratos/kratos/v2 v2.2.0
 	github.com/go-redis/redis/extra/redisotel v0.3.0
@@ -38,6 +39,7 @@ require (
 	go.opentelemetry.io/otel/sdk v1.3.0
 	golang.org/x/crypto v0.0.0-20220214200702-86341886e292
 	golang.org/x/net v0.0.0-20220127200216-cd36cc0744dd // indirect
+	google.golang.org/genproto v0.0.0-20220304144024-325a89244dc8 // indirect
 	google.golang.org/grpc v1.44.0
 	google.golang.org/protobuf v1.27.1
 )
