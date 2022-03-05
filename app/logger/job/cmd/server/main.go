@@ -47,12 +47,15 @@ var (
 	Version       = "1.0.0"
 	InstanceId, _ = os.Hostname()
 
-	flagConf string
-	env      = "dev"
+	flagConf       string
+	flagEnv        string
+	flagConfigHost string
 )
 
 func init() {
 	flag.StringVar(&flagConf, "conf", "../../configs", "config path, eg: -conf config.yaml")
+	flag.StringVar(&flagEnv, "env", "dev", "runtime environment, eg: -env dev")
+	flag.StringVar(&flagConfigHost, "chost", "127.0.0.1:8500", "config server host, eg: -chost 127.0.0.1:8500")
 }
 
 func newApp(logger log.Logger, gs *grpc.Server, ks *kafka.Server, rr registry.Registrar) *kratos.App {
@@ -83,7 +86,7 @@ func NewTracerProvider(conf *conf.Trace) error {
 			semConv.ServiceNameKey.String(Name),
 			semConv.ServiceVersionKey.String(Version),
 			semConv.ServiceInstanceIDKey.String(InstanceId),
-			attribute.String("env", env),
+			attribute.String("flagEnv", flagEnv),
 		)),
 	)
 
@@ -169,7 +172,7 @@ func NewApolloConfigSource() config.Source {
 
 func NewConsulConfigSource() config.Source {
 	consulClient, err := api.NewClient(&api.Config{
-		Address: "127.0.0.1:8500",
+		Address: flagConfigHost,
 	})
 	if err != nil {
 		panic(err)
