@@ -21,10 +21,10 @@
 
 ## 涵盖的技术点
 
-- 利用Kratos开发微服务
-- 利用Kratos框架实验CQRS
-- 利用TimeScaleDB(其实质为PostgreSQL的插件)存取时序数据
-- 利用Facbook的Entgo操作TimeScaleDB的时序数据
+- 使用Kratos开发微服务
+- 使用Kratos框架实验CQRS
+- 使用TimeScaleDB(其实质为PostgreSQL的插件)存取时序数据
+- 使用Facbook的Entgo操作TimeScaleDB的时序数据
 - 集成Kafka,并将Kafka封装成Kratos的一个Server,用于接收数据
 - 将服务注册进入Consul,用于服务发现
 - 将服务注册进入Jaeger,用于链路跟踪
