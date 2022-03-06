@@ -1,5 +1,11 @@
 # kratos-cqrs
 
+这是一个实验性质的项目,主要是为了实验在微服务框架 [Kratos](https://go-kratos.dev/) 里面调用Kafka进行数据库写操作.
+
+因为现在的Kratos不原生支持对队列的支持,所以我自己捯饬了一个项目 [kratos-transport](https://github.com/tx7do/kratos-transport) 做了支持,现在支持:kafka,RabbitMQ,MQTT,Redis,Websocket,NATS,Websocket.
+
+抄了 [go-micro](https://github.com/asim/go-micro) 里边的Broker代码,但是我发现asim似乎只管写不管测,老多bug了.
+
 ## 什么是 CQRS
 
 命令查询的责任分离Command Query Responsibility Segregation (简称CQRS)模式是一种架构体系模式，能够使改变模型的状态的命令和模型状态的查询实现分离。这属于DDD应用领域的一个模式，主要解决DDD在数据库报表输出上处理方式。

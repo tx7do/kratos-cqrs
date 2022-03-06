@@ -20,7 +20,7 @@ require (
 	github.com/lib/pq v1.10.4
 	github.com/nacos-group/nacos-sdk-go v1.1.0
 	github.com/stretchr/testify v1.7.0
-	github.com/tx7do/kratos-transport v0.0.0-20220305121630-7788f79a5bf4
+	github.com/tx7do/kratos-transport v0.0.0-20220306142350-869546196ffc
 	go.etcd.io/etcd/client/v3 v3.5.2
 	go.opentelemetry.io/otel v1.3.0
 	go.opentelemetry.io/otel/exporters/jaeger v1.0.0
