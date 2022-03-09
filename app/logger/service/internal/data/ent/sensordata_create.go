@@ -53,6 +53,12 @@ func (sdc *SensorDataCreate) SetCPU(f float64) *SensorDataCreate {
 	return sdc
 }
 
+// SetID sets the "id" field.
+func (sdc *SensorDataCreate) SetID(i int64) *SensorDataCreate {
+	sdc.mutation.SetID(i)
+	return sdc
+}
+
 // Mutation returns the SensorDataMutation object of the builder.
 func (sdc *SensorDataCreate) Mutation() *SensorDataMutation {
 	return sdc.mutation
@@ -143,8 +149,10 @@ func (sdc *SensorDataCreate) sqlSave(ctx context.Context) (*SensorData, error) {
 		}
 		return nil, err
 	}
-	id := _spec.ID.Value.(int64)
-	_node.ID = int(id)
+	if _spec.ID.Value != _node.ID {
+		id := _spec.ID.Value.(int64)
+		_node.ID = int64(id)
+	}
 	return _node, nil
 }
 
@@ -154,12 +162,16 @@ func (sdc *SensorDataCreate) createSpec() (*SensorData, *sqlgraph.CreateSpec) {
 		_spec = &sqlgraph.CreateSpec{
 			Table: sensordata.Table,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeInt64,
 				Column: sensordata.FieldID,
 			},
 		}
 	)
 	_spec.OnConflict = sdc.conflict
+	if id, ok := sdc.mutation.ID(); ok {
+		_node.ID = id
+		_spec.ID.Value = id
+	}
 	if value, ok := sdc.mutation.Time(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
 			Type:   field.TypeInt64,
@@ -300,17 +312,25 @@ func (u *SensorDataUpsert) UpdateCPU() *SensorDataUpsert {
 	return u
 }
 
-// UpdateNewValues updates the fields using the new values that were set on create.
+// UpdateNewValues updates the fields using the new values that were set on create except the ID field.
 // Using this option is equivalent to using:
 //
 //	client.SensorData.Create().
 //		OnConflict(
 //			sql.ResolveWithNewValues(),
+//			sql.ResolveWith(func(u *sql.UpdateSet) {
+//				u.SetIgnore(sensordata.FieldID)
+//			}),
 //		).
 //		Exec(ctx)
 //
 func (u *SensorDataUpsertOne) UpdateNewValues() *SensorDataUpsertOne {
 	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		if _, exists := u.create.mutation.ID(); exists {
+			s.SetIgnore(sensordata.FieldID)
+		}
+	}))
 	return u
 }
 
@@ -421,7 +441,7 @@ func (u *SensorDataUpsertOne) ExecX(ctx context.Context) {
 }
 
 // Exec executes the UPSERT query and returns the inserted/updated ID.
-func (u *SensorDataUpsertOne) ID(ctx context.Context) (id int, err error) {
+func (u *SensorDataUpsertOne) ID(ctx context.Context) (id int64, err error) {
 	node, err := u.create.Save(ctx)
 	if err != nil {
 		return id, err
@@ -430,7 +450,7 @@ func (u *SensorDataUpsertOne) ID(ctx context.Context) (id int, err error) {
 }
 
 // IDX is like ID, but panics if an error occurs.
-func (u *SensorDataUpsertOne) IDX(ctx context.Context) int {
+func (u *SensorDataUpsertOne) IDX(ctx context.Context) int64 {
 	id, err := u.ID(ctx)
 	if err != nil {
 		panic(err)
@@ -481,9 +501,9 @@ func (sdcb *SensorDataCreateBulk) Save(ctx context.Context) ([]*SensorData, erro
 				}
 				mutation.id = &nodes[i].ID
 				mutation.done = true
-				if specs[i].ID.Value != nil {
+				if specs[i].ID.Value != nil && nodes[i].ID == 0 {
 					id := specs[i].ID.Value.(int64)
-					nodes[i].ID = int(id)
+					nodes[i].ID = int64(id)
 				}
 				return nodes[i], nil
 			})
@@ -572,11 +592,22 @@ type SensorDataUpsertBulk struct {
 //	client.SensorData.Create().
 //		OnConflict(
 //			sql.ResolveWithNewValues(),
+//			sql.ResolveWith(func(u *sql.UpdateSet) {
+//				u.SetIgnore(sensordata.FieldID)
+//			}),
 //		).
 //		Exec(ctx)
 //
 func (u *SensorDataUpsertBulk) UpdateNewValues() *SensorDataUpsertBulk {
 	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		for _, b := range u.create.builders {
+			if _, exists := b.mutation.ID(); exists {
+				s.SetIgnore(sensordata.FieldID)
+				return
+			}
+		}
+	}))
 	return u
 }
 

@@ -168,7 +168,7 @@ func (c *SensorClient) UpdateOne(s *Sensor) *SensorUpdateOne {
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *SensorClient) UpdateOneID(id int64) *SensorUpdateOne {
+func (c *SensorClient) UpdateOneID(id int) *SensorUpdateOne {
 	mutation := newSensorMutation(c.config, OpUpdateOne, withSensorID(id))
 	return &SensorUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
@@ -185,7 +185,7 @@ func (c *SensorClient) DeleteOne(s *Sensor) *SensorDeleteOne {
 }
 
 // DeleteOneID returns a delete builder for the given id.
-func (c *SensorClient) DeleteOneID(id int64) *SensorDeleteOne {
+func (c *SensorClient) DeleteOneID(id int) *SensorDeleteOne {
 	builder := c.Delete().Where(sensor.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
@@ -200,12 +200,12 @@ func (c *SensorClient) Query() *SensorQuery {
 }
 
 // Get returns a Sensor entity by its id.
-func (c *SensorClient) Get(ctx context.Context, id int64) (*Sensor, error) {
+func (c *SensorClient) Get(ctx context.Context, id int) (*Sensor, error) {
 	return c.Query().Where(sensor.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *SensorClient) GetX(ctx context.Context, id int64) *Sensor {
+func (c *SensorClient) GetX(ctx context.Context, id int) *Sensor {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -258,7 +258,7 @@ func (c *SensorDataClient) UpdateOne(sd *SensorData) *SensorDataUpdateOne {
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *SensorDataClient) UpdateOneID(id int) *SensorDataUpdateOne {
+func (c *SensorDataClient) UpdateOneID(id int64) *SensorDataUpdateOne {
 	mutation := newSensorDataMutation(c.config, OpUpdateOne, withSensorDataID(id))
 	return &SensorDataUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
@@ -275,7 +275,7 @@ func (c *SensorDataClient) DeleteOne(sd *SensorData) *SensorDataDeleteOne {
 }
 
 // DeleteOneID returns a delete builder for the given id.
-func (c *SensorDataClient) DeleteOneID(id int) *SensorDataDeleteOne {
+func (c *SensorDataClient) DeleteOneID(id int64) *SensorDataDeleteOne {
 	builder := c.Delete().Where(sensordata.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
@@ -290,12 +290,12 @@ func (c *SensorDataClient) Query() *SensorDataQuery {
 }
 
 // Get returns a SensorData entity by its id.
-func (c *SensorDataClient) Get(ctx context.Context, id int) (*SensorData, error) {
+func (c *SensorDataClient) Get(ctx context.Context, id int64) (*SensorData, error) {
 	return c.Query().Where(sensordata.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *SensorDataClient) GetX(ctx context.Context, id int) *SensorData {
+func (c *SensorDataClient) GetX(ctx context.Context, id int64) *SensorData {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)

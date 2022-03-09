@@ -20,7 +20,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			Table:   sensor.Table,
 			Columns: sensor.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt64,
+				Type:   field.TypeInt,
 				Column: sensor.FieldID,
 			},
 		},
@@ -35,7 +35,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			Table:   sensordata.Table,
 			Columns: sensordata.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeInt64,
 				Column: sensordata.FieldID,
 			},
 		},
@@ -90,8 +90,8 @@ func (f *SensorFilter) Where(p entql.P) {
 	})
 }
 
-// WhereID applies the entql int64 predicate on the id field.
-func (f *SensorFilter) WhereID(p entql.Int64P) {
+// WhereID applies the entql int predicate on the id field.
+func (f *SensorFilter) WhereID(p entql.IntP) {
 	f.Where(p.Field(sensor.FieldID))
 }
 
@@ -139,8 +139,8 @@ func (f *SensorDataFilter) Where(p entql.P) {
 	})
 }
 
-// WhereID applies the entql int predicate on the id field.
-func (f *SensorDataFilter) WhereID(p entql.IntP) {
+// WhereID applies the entql int64 predicate on the id field.
+func (f *SensorDataFilter) WhereID(p entql.Int64P) {
 	f.Where(p.Field(sensordata.FieldID))
 }
 

@@ -72,7 +72,7 @@ func (sdd *SensorDataDelete) sqlExec(ctx context.Context) (int, error) {
 		Node: &sqlgraph.NodeSpec{
 			Table: sensordata.Table,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeInt64,
 				Column: sensordata.FieldID,
 			},
 		},

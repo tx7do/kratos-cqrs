@@ -85,8 +85,8 @@ func (sq *SensorQuery) FirstX(ctx context.Context) *Sensor {
 
 // FirstID returns the first Sensor ID from the query.
 // Returns a *NotFoundError when no Sensor ID was found.
-func (sq *SensorQuery) FirstID(ctx context.Context) (id int64, err error) {
-	var ids []int64
+func (sq *SensorQuery) FirstID(ctx context.Context) (id int, err error) {
+	var ids []int
 	if ids, err = sq.Limit(1).IDs(ctx); err != nil {
 		return
 	}
@@ -98,7 +98,7 @@ func (sq *SensorQuery) FirstID(ctx context.Context) (id int64, err error) {
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (sq *SensorQuery) FirstIDX(ctx context.Context) int64 {
+func (sq *SensorQuery) FirstIDX(ctx context.Context) int {
 	id, err := sq.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -136,8 +136,8 @@ func (sq *SensorQuery) OnlyX(ctx context.Context) *Sensor {
 // OnlyID is like Only, but returns the only Sensor ID in the query.
 // Returns a *NotSingularError when exactly one Sensor ID is not found.
 // Returns a *NotFoundError when no entities are found.
-func (sq *SensorQuery) OnlyID(ctx context.Context) (id int64, err error) {
-	var ids []int64
+func (sq *SensorQuery) OnlyID(ctx context.Context) (id int, err error) {
+	var ids []int
 	if ids, err = sq.Limit(2).IDs(ctx); err != nil {
 		return
 	}
@@ -153,7 +153,7 @@ func (sq *SensorQuery) OnlyID(ctx context.Context) (id int64, err error) {
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (sq *SensorQuery) OnlyIDX(ctx context.Context) int64 {
+func (sq *SensorQuery) OnlyIDX(ctx context.Context) int {
 	id, err := sq.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -179,8 +179,8 @@ func (sq *SensorQuery) AllX(ctx context.Context) []*Sensor {
 }
 
 // IDs executes the query and returns a list of Sensor IDs.
-func (sq *SensorQuery) IDs(ctx context.Context) ([]int64, error) {
-	var ids []int64
+func (sq *SensorQuery) IDs(ctx context.Context) ([]int, error) {
+	var ids []int
 	if err := sq.Select(sensor.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -188,7 +188,7 @@ func (sq *SensorQuery) IDs(ctx context.Context) ([]int64, error) {
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (sq *SensorQuery) IDsX(ctx context.Context) []int64 {
+func (sq *SensorQuery) IDsX(ctx context.Context) []int {
 	ids, err := sq.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -360,7 +360,7 @@ func (sq *SensorQuery) querySpec() *sqlgraph.QuerySpec {
 			Table:   sensor.Table,
 			Columns: sensor.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt64,
+				Type:   field.TypeInt,
 				Column: sensor.FieldID,
 			},
 		},

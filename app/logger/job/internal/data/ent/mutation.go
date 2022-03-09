@@ -31,7 +31,7 @@ type SensorMutation struct {
 	config
 	op            Op
 	typ           string
-	id            *int64
+	id            *int
 	_type         *string
 	location      *string
 	clearedFields map[string]struct{}
@@ -60,7 +60,7 @@ func newSensorMutation(c config, op Op, opts ...sensorOption) *SensorMutation {
 }
 
 // withSensorID sets the ID field of the mutation.
-func withSensorID(id int64) sensorOption {
+func withSensorID(id int) sensorOption {
 	return func(m *SensorMutation) {
 		var (
 			err   error
@@ -112,13 +112,13 @@ func (m SensorMutation) Tx() (*Tx, error) {
 
 // SetID sets the value of the id field. Note that this
 // operation is only accepted on creation of Sensor entities.
-func (m *SensorMutation) SetID(id int64) {
+func (m *SensorMutation) SetID(id int) {
 	m.id = &id
 }
 
 // ID returns the ID value in the mutation. Note that the ID is only available
 // if it was provided to the builder or after it was returned from the database.
-func (m *SensorMutation) ID() (id int64, exists bool) {
+func (m *SensorMutation) ID() (id int, exists bool) {
 	if m.id == nil {
 		return
 	}
@@ -383,7 +383,7 @@ type SensorDataMutation struct {
 	config
 	op             Op
 	typ            string
-	id             *int
+	id             *int64
 	time           *int64
 	addtime        *int64
 	sensor_id      *int
@@ -418,7 +418,7 @@ func newSensorDataMutation(c config, op Op, opts ...sensordataOption) *SensorDat
 }
 
 // withSensorDataID sets the ID field of the mutation.
-func withSensorDataID(id int) sensordataOption {
+func withSensorDataID(id int64) sensordataOption {
 	return func(m *SensorDataMutation) {
 		var (
 			err   error
@@ -468,9 +468,15 @@ func (m SensorDataMutation) Tx() (*Tx, error) {
 	return tx, nil
 }
 
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of SensorData entities.
+func (m *SensorDataMutation) SetID(id int64) {
+	m.id = &id
+}
+
 // ID returns the ID value in the mutation. Note that the ID is only available
 // if it was provided to the builder or after it was returned from the database.
-func (m *SensorDataMutation) ID() (id int, exists bool) {
+func (m *SensorDataMutation) ID() (id int64, exists bool) {
 	if m.id == nil {
 		return
 	}

@@ -140,7 +140,7 @@ func (su *SensorUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Table:   sensor.Table,
 			Columns: sensor.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt64,
+				Type:   field.TypeInt,
 				Column: sensor.FieldID,
 			},
 		},
@@ -306,7 +306,7 @@ func (suo *SensorUpdateOne) sqlSave(ctx context.Context) (_node *Sensor, err err
 			Table:   sensor.Table,
 			Columns: sensor.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt64,
+				Type:   field.TypeInt,
 				Column: sensor.FieldID,
 			},
 		},

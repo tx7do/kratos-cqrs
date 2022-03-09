@@ -50,7 +50,7 @@ func (sc *SensorCreate) SetNillableLocation(s *string) *SensorCreate {
 }
 
 // SetID sets the "id" field.
-func (sc *SensorCreate) SetID(i int64) *SensorCreate {
+func (sc *SensorCreate) SetID(i int) *SensorCreate {
 	sc.mutation.SetID(i)
 	return sc
 }
@@ -167,7 +167,7 @@ func (sc *SensorCreate) sqlSave(ctx context.Context) (*Sensor, error) {
 	}
 	if _spec.ID.Value != _node.ID {
 		id := _spec.ID.Value.(int64)
-		_node.ID = int64(id)
+		_node.ID = int(id)
 	}
 	return _node, nil
 }
@@ -178,7 +178,7 @@ func (sc *SensorCreate) createSpec() (*Sensor, *sqlgraph.CreateSpec) {
 		_spec = &sqlgraph.CreateSpec{
 			Table: sensor.Table,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt64,
+				Type:   field.TypeInt,
 				Column: sensor.FieldID,
 			},
 		}
@@ -376,7 +376,7 @@ func (u *SensorUpsertOne) ExecX(ctx context.Context) {
 }
 
 // Exec executes the UPSERT query and returns the inserted/updated ID.
-func (u *SensorUpsertOne) ID(ctx context.Context) (id int64, err error) {
+func (u *SensorUpsertOne) ID(ctx context.Context) (id int, err error) {
 	node, err := u.create.Save(ctx)
 	if err != nil {
 		return id, err
@@ -385,7 +385,7 @@ func (u *SensorUpsertOne) ID(ctx context.Context) (id int64, err error) {
 }
 
 // IDX is like ID, but panics if an error occurs.
-func (u *SensorUpsertOne) IDX(ctx context.Context) int64 {
+func (u *SensorUpsertOne) IDX(ctx context.Context) int {
 	id, err := u.ID(ctx)
 	if err != nil {
 		panic(err)
@@ -439,7 +439,7 @@ func (scb *SensorCreateBulk) Save(ctx context.Context) ([]*Sensor, error) {
 				mutation.done = true
 				if specs[i].ID.Value != nil && nodes[i].ID == 0 {
 					id := specs[i].ID.Value.(int64)
-					nodes[i].ID = int64(id)
+					nodes[i].ID = int(id)
 				}
 				return nodes[i], nil
 			})

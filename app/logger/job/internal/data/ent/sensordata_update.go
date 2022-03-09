@@ -157,7 +157,7 @@ func (sdu *SensorDataUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Table:   sensordata.Table,
 			Columns: sensordata.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeInt64,
 				Column: sensordata.FieldID,
 			},
 		},
@@ -388,7 +388,7 @@ func (sduo *SensorDataUpdateOne) sqlSave(ctx context.Context) (_node *SensorData
 			Table:   sensordata.Table,
 			Columns: sensordata.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeInt64,
 				Column: sensordata.FieldID,
 			},
 		},

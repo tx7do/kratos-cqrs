@@ -14,7 +14,7 @@ import (
 type SensorData struct {
 	config `json:"-"`
 	// ID of the ent.
-	ID int `json:"id,omitempty"`
+	ID int64 `json:"id,omitempty"`
 	// Time holds the value of the "time" field.
 	// 时间戳
 	Time *int64 `json:"time,omitempty"`
@@ -58,7 +58,7 @@ func (sd *SensorData) assignValues(columns []string, values []interface{}) error
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
-			sd.ID = int(value.Int64)
+			sd.ID = int64(value.Int64)
 		case sensordata.FieldTime:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field time", values[i])

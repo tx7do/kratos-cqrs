@@ -14,7 +14,7 @@ import (
 type Sensor struct {
 	config `json:"-"`
 	// ID of the ent.
-	ID int64 `json:"id,omitempty"`
+	ID int `json:"id,omitempty"`
 	// Type holds the value of the "type" field.
 	// 传感器类型
 	Type string `json:"type,omitempty"`
@@ -52,7 +52,7 @@ func (s *Sensor) assignValues(columns []string, values []interface{}) error {
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
-			s.ID = int64(value.Int64)
+			s.ID = int(value.Int64)
 		case sensor.FieldType:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field type", values[i])
