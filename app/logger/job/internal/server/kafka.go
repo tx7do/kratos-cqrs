@@ -3,7 +3,6 @@ package server
 import (
 	"context"
 
-	"github.com/go-kratos/kratos/v2/encoding"
 	"github.com/go-kratos/kratos/v2/log"
 
 	"github.com/tx7do/kratos-transport/transport/kafka"
@@ -18,7 +17,7 @@ func NewKafkaServer(c *conf.Server, _ log.Logger, svc *service.LoggerJobService)
 
 	srv := kafka.NewServer(
 		kafka.WithAddress(c.Kafka.Addrs),
-		kafka.WithCodec(encoding.GetCodec("json")),
+		kafka.WithCodec("json"),
 	)
 
 	registerKafkaSubscribers(ctx, srv, svc)
