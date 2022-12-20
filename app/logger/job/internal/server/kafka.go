@@ -31,7 +31,7 @@ func registerKafkaSubscribers(ctx context.Context, srv *kafka.Server, svc *servi
 		"sensor_logger",
 		false,
 		registerSensorDataHandler(svc.InsertSensorData),
-		SensorDataCreator,
+		sensorDataCreator,
 	)
 
 	_ = srv.RegisterSubscriber(ctx,
@@ -39,6 +39,6 @@ func registerKafkaSubscribers(ctx context.Context, srv *kafka.Server, svc *servi
 		"sensor",
 		false,
 		registerSensorHandler(svc.InsertSensor),
-		SensorCreator,
+		sensorCreator,
 	)
 }

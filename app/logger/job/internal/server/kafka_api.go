@@ -8,13 +8,13 @@ import (
 	svcV1 "kratos-cqrs/api/logger/service/v1"
 )
 
-func SensorCreator() broker.Any     { return &svcV1.Sensor{} }
-func SensorDataCreator() broker.Any { return &[]svcV1.SensorData{} }
+func sensorCreator() broker.Any     { return &svcV1.Sensor{} }
+func sensorDataCreator() broker.Any { return &[]svcV1.SensorData{} }
 
-type SensorHandler func(_ context.Context, topic string, headers broker.Headers, msg *svcV1.Sensor) error
-type SensorDataHandler func(_ context.Context, topic string, headers broker.Headers, msg *[]svcV1.SensorData) error
+type sensorHandler func(_ context.Context, topic string, headers broker.Headers, msg *svcV1.Sensor) error
+type sensorDataHandler func(_ context.Context, topic string, headers broker.Headers, msg *[]svcV1.SensorData) error
 
-func registerSensorDataHandler(fnc SensorDataHandler) broker.Handler {
+func registerSensorDataHandler(fnc sensorDataHandler) broker.Handler {
 	return func(ctx context.Context, event broker.Event) error {
 		switch t := event.Message().Body.(type) {
 		case *[]svcV1.SensorData:
@@ -28,7 +28,7 @@ func registerSensorDataHandler(fnc SensorDataHandler) broker.Handler {
 	}
 }
 
-func registerSensorHandler(fnc SensorHandler) broker.Handler {
+func registerSensorHandler(fnc sensorHandler) broker.Handler {
 	return func(ctx context.Context, event broker.Event) error {
 		switch t := event.Message().Body.(type) {
 		case *svcV1.Sensor:
