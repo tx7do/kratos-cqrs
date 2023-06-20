@@ -1,6 +1,8 @@
 module kratos-cqrs
 
-go 1.18
+go 1.19
+
+replace google.golang.org/grpc => google.golang.org/grpc v1.46.2
 
 require (
 	entgo.io/ent v0.11.4
@@ -24,8 +26,8 @@ require (
 	github.com/sony/sonyflake v1.1.0
 	github.com/spf13/cobra v1.6.1
 	github.com/stretchr/testify v1.8.4
-	github.com/tx7do/kratos-transport v1.0.5
-	github.com/tx7do/kratos-transport/transport/kafka v0.0.0-20230620065016-d36b71d0fffb
+	github.com/tx7do/kratos-transport v1.0.6
+	github.com/tx7do/kratos-transport/transport/kafka v0.0.0-20230620164808-396344158a1b
 	go.etcd.io/etcd/client/v3 v3.5.6
 	go.opentelemetry.io/otel v1.16.0
 	go.opentelemetry.io/otel/exporters/jaeger v1.16.0
@@ -95,12 +97,10 @@ require (
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/segmentio/kafka-go v0.4.40 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
-	github.com/tx7do/kratos-transport/broker/kafka v0.0.0-20230620065016-d36b71d0fffb // indirect
+	github.com/tx7do/kratos-transport/broker/kafka v0.0.0-20230620164808-396344158a1b // indirect
 	github.com/xdg-go/pbkdf2 v1.0.0 // indirect
 	github.com/xdg-go/scram v1.1.2 // indirect
 	github.com/xdg-go/stringprep v1.0.4 // indirect
-	github.com/xdg/scram v1.0.5 // indirect
-	github.com/xdg/stringprep v1.0.3 // indirect
 	github.com/zclconf/go-cty v1.8.0 // indirect
 	go.etcd.io/etcd/api/v3 v3.5.6 // indirect
 	go.etcd.io/etcd/client/pkg/v3 v3.5.6 // indirect
@@ -115,7 +115,6 @@ require (
 	golang.org/x/sync v0.3.0 // indirect
 	golang.org/x/sys v0.9.0 // indirect
 	golang.org/x/text v0.10.0 // indirect
-	google.golang.org/genproto v0.0.0-20230525234025-438c736192d0 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20230525234020-1aefcd67740a // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20230530153820-e85fd2cbaebc // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
